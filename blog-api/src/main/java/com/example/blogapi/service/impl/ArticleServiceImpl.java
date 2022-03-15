@@ -29,11 +29,14 @@ public class ArticleServiceImpl implements ArticleService {
     private TagService tagservice;
     @Autowired
     private SysUserService sysUserService;
+
+    /**
+     * 1.分页查询article数据库表
+     * @param pageParams
+     * @return
+     */
     @Override
     public Result listArticle(PageParams pageParams) {
-        /**
-         * 1.分页查询article数据库表
-         */
         Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         //是否置顶进行排序
@@ -54,6 +57,18 @@ public class ArticleServiceImpl implements ArticleService {
         queryWrapper.select(Article::getId,Article::getTitle);
         queryWrapper.last("limit "+limit);
         //select id,title from article order by view_counts desc limit
+        List<Article> articles = articleMapper.selectList(queryWrapper);
+        return Result.success(copyList(articles,false,false));
+    }
+
+    @Override
+    public Result newArticles(int limit) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.orderByDesc(Article::getCreateDate);
+        queryWrapper.select(Article::getId,Article::getTitle);
+        queryWrapper.last("limit "+limit);
+        //select id,title from article order by create_date desc limit
         List<Article> articles = articleMapper.selectList(queryWrapper);
         return Result.success(copyList(articles,false,false));
     }
