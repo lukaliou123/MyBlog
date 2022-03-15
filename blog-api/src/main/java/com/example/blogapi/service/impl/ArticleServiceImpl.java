@@ -1,6 +1,7 @@
 package com.example.blogapi.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.blogapi.dao.mapper.ArticleMapper;
 import com.example.blogapi.dao.pojo.Article;
@@ -43,6 +44,18 @@ public class ArticleServiceImpl implements ArticleService {
         //能直接返回吗，不能
         List<ArticleVo> articleVoList = copyList(records,true,true);
         return Result.success(articleVoList);
+    }
+
+    @Override
+    public Result hotArticle(int limit) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+        //这里根据浏览量进行倒叙
+        queryWrapper.orderByDesc(Article::getViewCounts);
+        queryWrapper.select(Article::getId,Article::getTitle);
+        queryWrapper.last("limit "+limit);
+        //select id,title from article order by view_counts desc limit
+        List<Article> articles = articleMapper.selectList(queryWrapper);
+        return Result.success(copyList(articles,false,false));
     }
 
     private List<ArticleVo> copyList(List<Article> records,Boolean isTag, Boolean isAuthor) {
