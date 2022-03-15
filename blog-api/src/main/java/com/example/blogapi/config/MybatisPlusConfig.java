@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 //代表是spring得和新闻键
 @Configuration
 //扫包，将此包下的接口生成代理实现类，并且注册到spring容器中
-@MapperScan("com.example.blogapi.mapper")
+@MapperScan("com.example.blogapi.dao.mapper")
 public class MybatisPlusConfig {
     //分页插件
     @Bean
