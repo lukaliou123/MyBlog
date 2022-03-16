@@ -118,7 +118,7 @@ public class LoginServiceImpl implements LoginService {
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
         //处理加密信息
-        //password = DigestUtils.md5Hex(password+slat);//此为真实密码
+        password = DigestUtils.md5Hex(password+slat);//此为真实密码
         SysUser sysUser = findUser(account,password);
         if(sysUser == null){
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(), ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
