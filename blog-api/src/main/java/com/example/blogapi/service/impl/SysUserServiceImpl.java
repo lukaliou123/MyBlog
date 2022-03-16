@@ -3,15 +3,27 @@ package com.example.blogapi.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.blogapi.dao.mapper.SysUserMapper;
 import com.example.blogapi.dao.pojo.SysUser;
+import com.example.blogapi.service.LoginService;
 import com.example.blogapi.service.SysUserService;
+import com.example.blogapi.vo.ErrorCode;
+import com.example.blogapi.vo.LoginUserVo;
+import com.example.blogapi.vo.Result;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 @Service
+@Repository
 public class SysUserServiceImpl implements SysUserService {
 
     @Autowired
     private SysUserMapper sysUserMapper;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+    @Autowired
+    private LoginService loginService;
     @Override
     public SysUser findUserById(Long id) {
         SysUser sysUser = sysUserMapper.selectById(id);
@@ -30,5 +42,25 @@ public class SysUserServiceImpl implements SysUserService {
         queryWrapper.select(SysUser::getAccount,SysUser::getId,SysUser::getAvatar,SysUser::getNickname);
         queryWrapper.last("limit 1");
         return sysUserMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Result findUserByToken(String token) {
+        /**
+         * 1.token合法性校验
+         *  是否为空，解析是否成功 redis是否存在
+         * 2.如果校验失败 返回错误
+         * 3.如果成功，返回对应的结果 LoginUserVo
+         */
+        SysUser sysUser = loginService.checkToken(token);
+        if(sysUser == null){
+            return Result.fail(ErrorCode.TOKEN_ERROR.getCode(), ErrorCode.TOKEN_ERROR.getMsg());
+        }
+        LoginUserVo loginUserVo = new LoginUserVo();
+        loginUserVo.setId(sysUser.getId());
+        loginUserVo.setNickname(sysUser.getNickname());
+        loginUserVo.setAvatar(sysUser.getAvatar());
+        loginUserVo.setAccount(sysUser.getAccount());
+        return Result.success(loginUserVo);
     }
 }

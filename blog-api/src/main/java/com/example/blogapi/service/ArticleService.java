@@ -2,7 +2,9 @@ package com.example.blogapi.service;
 
 import com.example.blogapi.vo.Result;
 import com.example.blogapi.vo.params.PageParams;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ArticleService {
     /**
      * 分页查询 文章列表

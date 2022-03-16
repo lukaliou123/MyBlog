@@ -13,18 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private static final String slat = "mszlu!@#";
-
     @Autowired
     private SysUserService sysUserService;
+
+    private static final String slat = "mszlu!@#";
 
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
@@ -36,8 +38,8 @@ public class LoginServiceImpl implements LoginService {
          * 2.根据用户名和密码去user表中查询 是否存在
          * 3.如果不存在，登陆失败
          * 4.如果存在，使用jwt 生成token 返回给前端
-         * 5.token放入redis,redis token:user信息 设置过期时间(登录认证的时候 先认证token字符串是否合法，去redis认证是否存在）
-         *
+         * 5.token放入redis,redis token:user信息 设置过期时间
+         * (登录认证的时候 先认证token字符串是否合法，去redis认证是否存在）
          */
         String account = loginParam.getAccount();
         String password = loginParam.getPassword();
@@ -45,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
         //处理加密信息
-        password = DigestUtils.md5Hex(password+slat);//此为真实密码
+        //password = DigestUtils.md5Hex(password+slat);//此为真实密码
         SysUser sysUser = sysUserService.findUser(account,password);
         if(sysUser == null){
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(), ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
@@ -53,5 +55,23 @@ public class LoginServiceImpl implements LoginService {
         String token = JWTUtils.createToken(sysUser.getId());
         redisTemplate.opsForValue().set("TOKEN_"+token, JSON.toJSONString(sysUser),1, TimeUnit.DAYS);
         return Result.success(token);
+    }
+
+    @Override
+    public SysUser checkToken(String token) {
+        if(StringUtils.isBlank(token)){
+            return null;
+        }
+        Map<String,Object> stringObjectMap =JWTUtils.checkToken(token);
+        if(stringObjectMap == null){
+            return null;
+        }
+
+        String userJson = redisTemplate.opsForValue().get("TOKEN_"+token);
+        if(StringUtils.isBlank(userJson)){
+            return null; //redis里面没有说明过期了
+        }
+        SysUser sysUser = JSON.parseObject(userJson,SysUser.class);
+        return sysUser;
     }
 }

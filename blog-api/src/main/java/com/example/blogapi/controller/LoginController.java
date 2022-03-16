@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("login")
 public class LoginController {
-//    @Autowired
-//    private SysUserService sysUserService;
+    @Autowired
+    private SysUserService sysUserService;
+
     @Autowired
     private LoginService loginService;
 
