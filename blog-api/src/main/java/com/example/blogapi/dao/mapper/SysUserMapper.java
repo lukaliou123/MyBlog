@@ -4,6 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.blogapi.dao.pojo.SysUser;
 import org.springframework.stereotype.Repository;
 
-//@Repository
+@Repository
 public interface SysUserMapper extends BaseMapper<SysUser> {
 }
