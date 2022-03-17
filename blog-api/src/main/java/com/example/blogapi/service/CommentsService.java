@@ -1,6 +1,7 @@
 package com.example.blogapi.service;
 
 import com.example.blogapi.vo.Result;
+import com.example.blogapi.vo.params.CommentParam;
 
 public interface CommentsService {
 
@@ -10,4 +11,6 @@ public interface CommentsService {
      * @return
      */
     Result commentsByArticleId(Long id);
+
+    Result comment(CommentParam commentParam);
 }
