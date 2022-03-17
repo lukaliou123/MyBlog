@@ -1,11 +1,12 @@
 package com.example.blogapi.vo;
 
 import lombok.Data;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 @Data
 public class CategoryVo {
-
-    private String id;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
     private String avatar;
 

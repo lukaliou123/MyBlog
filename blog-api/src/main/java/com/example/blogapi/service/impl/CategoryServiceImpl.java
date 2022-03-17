@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryVo copy(Category category){
         CategoryVo categoryVo = new CategoryVo();
         BeanUtils.copyProperties(category,categoryVo);
-        categoryVo.setId(String.valueOf(category.getId()));
+        categoryVo.setId(category.getId());
         return categoryVo;
     }
     public List<CategoryVo> copyList(List<Category> categoryList){

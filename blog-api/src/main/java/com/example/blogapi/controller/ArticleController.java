@@ -2,6 +2,7 @@ package com.example.blogapi.controller;
 
 import com.example.blogapi.service.ArticleService;
 import com.example.blogapi.vo.Result;
+import com.example.blogapi.vo.params.ArticleParam;
 import com.example.blogapi.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -57,5 +58,12 @@ public class ArticleController {
         return articleService.findArticleById(articleId);
     }
 
+    //接口irl:/articles/publish
+    //
+    //请求方式：POST
+    @PostMapping("publish")
+    public Result publish(@RequestBody ArticleParam articleParam){
+        return articleService.publish(articleParam);
+    }
 
 }
