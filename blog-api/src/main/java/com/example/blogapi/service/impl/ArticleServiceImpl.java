@@ -130,7 +130,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setSummary(articleParam.getSummary());
         article.setCommentCounts(0);
         article.setCreateDate(System.currentTimeMillis());
-        article.setCategoryId(articleParam.getCategory().getId());
+        article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
         //插入之后 会生成一个文章id
         this.articleMapper.insert(article);
         //tag

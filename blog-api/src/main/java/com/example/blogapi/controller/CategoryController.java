@@ -17,4 +17,9 @@ public class CategoryController {
     public Result categories(){
         return categoryService.findAll();
     }
+    //所有分类的细节
+    @GetMapping("detail")
+    public Result categoriesDetail(){
+        return categoryService.findAllDetail();
+    }
 }
