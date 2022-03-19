@@ -11,6 +11,6 @@ public class UserVo {
 
     private String avatar;
     //防止前端 精度损失 把id转为string
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    //@JsonSerialize(using = ToStringSerializer.class)
+    private String id;
 }
