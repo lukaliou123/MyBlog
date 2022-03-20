@@ -289,7 +289,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        axios.get("/admin/permission/delete/"+row.id).then((res)=>{
+                        axios.get("/admin/permission/delete/"+row.id).then((res)=>{p
                             if (res.data.success){
                                 this.$message.success("删除成功");
                                 this.findPage();
