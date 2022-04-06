@@ -2,7 +2,9 @@ package com.example.blogapi.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.blogapi.dao.dos.Archives;
 import com.example.blogapi.dao.mapper.ArticleBodyMapper;
@@ -14,12 +16,10 @@ import com.example.blogapi.dao.pojo.ArticleTag;
 import com.example.blogapi.dao.pojo.SysUser;
 import com.example.blogapi.service.*;
 import com.example.blogapi.util.UserThreadLocal;
-import com.example.blogapi.vo.ArticleBodyVo;
-import com.example.blogapi.vo.ArticleVo;
-import com.example.blogapi.vo.Result;
-import com.example.blogapi.vo.TagVo;
+import com.example.blogapi.vo.*;
 import com.example.blogapi.vo.params.ArticleParam;
 import com.example.blogapi.vo.params.PageParams;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private ArticleTagMapper articleTagMapper;
+
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public Result listArticle(PageParams pageParams){
@@ -188,6 +191,10 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateById(article);
         Map<String,String> map = new HashMap<>();
         map.put("id",article.getId().toString());
+            //发送一条消息给rocketmq 当前文章更新了，更新一下缓存吧
+        ArticleMessage articleMessage = new ArticleMessage();
+        articleMessage.setArticleId(article.getId());
+        rocketMQTemplate.convertAndSend("blog-update-article",articleMessage);
         return Result.success(map);
     }
 
